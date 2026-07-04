@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAYHEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0d;
+    --surface:#151419;
+    --surface-hi:#1e1c24;
+    --text:#f5f3ee;
+    --text-muted:#8d8a94;
+    --red:#ff2e45;
+    --amber:#ffb020;
+    --violet:#7c5cff;
+    --teal:#22c7a9;
+    --line:rgba(245,243,238,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Manrope', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--red); color:#fff; }
+  body.has-bg-image{
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    background-repeat:no-repeat;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; gap:28px;
+    padding:16px 5vw;
+    background:rgba(10,10,13,0.86);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .logo{
+    position:relative;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:34px;
+    letter-spacing:2px;
+    color:var(--text);
+    text-transform:uppercase;
+    line-height:1;
+    cursor:pointer;
+    user-select:none;
+    filter:drop-shadow(0 0 18px rgba(255,46,69,0.25));
+  }
+  .logo span{ position:relative; display:inline-block; clip-path:polygon(0 0,100% 0,96% 100%,2% 100%); }
+  .logo::before, .logo::after{
+    content:attr(data-text);
+    position:absolute; left:0; top:0;
+    clip-path:polygon(0 0,100% 0,96% 100%,2% 100%);
+  }
+  .logo::before{ color:var(--red); transform:translate(-2px,1px); opacity:0.65; z-index:-1; }
+  .logo::after{ color:var(--violet); transform:translate(2px,-1px); opacity:0.5; z-index:-2; }
+  .logo .dot{ color:var(--red); }
+  .logo.has-image{ filter:none; }
+  .logo.has-image::before, .logo.has-image::after{ content:none; }
+  .logo.has-image img{
+    display:block; height:38px; width:auto; max-width:220px;
+    object-fit:contain;
+  }
+
+  nav.mainnav{
+    display:flex; gap:6px;
+    background:var(--surface);
+    padding:5px; border-radius:999px;
+    border:1px solid var(--line);
+  }
+  nav.mainnav button{
+    font-family:'Manrope', sans-serif;
+    font-weight:700; font-size:13px;
+    letter-spacing:0.4px;
+    padding:9px 18px;
+    border-radius:999px;
+    border:none; background:transparent;
+    color:var(--text-muted);
+    cursor:pointer;
+    transition:all .2s ease;
+  }
+  nav.mainnav button:hover{ color:var(--text); }
+  nav.mainnav button.active{
+    background:var(--red); color:#fff;
+    box-shadow:0 4px 16px rgba(255,46,69,0.35);
+  }
+
+  .searchwrap{
+    margin-left:auto;
+    position:relative;
+    min-width:220px;
+    flex:1; max-width:340px;
+  }
+  .searchwrap svg{
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    width:16px; height:16px; stroke:var(--text-muted);
+  }
+  .searchwrap input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'Manrope', sans-serif;
+    font-size:14px;
+    padding:11px 14px 11px 38px;
+    border-radius:999px;
+    outline:none;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .searchwrap input:focus{ border-color:var(--red); background:var(--surface-hi); }
+  .searchwrap input::placeholder{ color:var(--text-muted); }
+
+  /* ---------- MAIN / RAILS ---------- */
+  main{ padding:36px 0 90px; }
+  .rail-section{ margin-bottom:44px; }
+  .rail-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding:0 5vw; margin-bottom:16px;
+  }
+  .rail-eyebrow{
+    font-size:11px; font-weight:800; letter-spacing:2.5px;
+    color:var(--red); text-transform:uppercase;
+    display:block; margin-bottom:4px;
+  }
+  .rail-title{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:30px; letter-spacing:1px;
+    color:var(--text);
+  }
+  .rail-arrows{ display:flex; gap:8px; }
+  .rail-arrows button{
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--line); background:var(--surface);
+    color:var(--text); cursor:pointer; font-size:16px;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease, transform .15s ease;
+  }
+  .rail-arrows button:hover{ background:var(--surface-hi); transform:scale(1.06); }
+
+  .rail-track{
+    display:flex; gap:16px;
+    overflow-x:auto; scroll-snap-type:x proximity;
+    padding:6px 5vw 14px;
+    scrollbar-width:none;
+  }
+  .rail-track::-webkit-scrollbar{ display:none; }
+
+  .card{
+    position:relative;
+    flex:0 0 auto;
+    width:180px; aspect-ratio:2/3;
+    border-radius:14px;
+    overflow:hidden;
+    cursor:pointer;
+    scroll-snap-align:start;
+    background:var(--surface);
+    border:1px solid var(--line);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .card:hover{ transform:translateY(-6px); box-shadow:0 18px 34px rgba(0,0,0,0.5); }
+  .card img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .card .poster-fallback{
+    width:100%; height:100%;
+    display:flex; align-items:flex-end;
+    padding:12px;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:19px; line-height:1.05;
+    letter-spacing:0.5px;
+    color:rgba(255,255,255,0.92);
+  }
+  .card .badge{
+    position:absolute; top:9px; left:9px;
+    background:rgba(10,10,13,0.72);
+    border:1px solid rgba(255,255,255,0.15);
+    color:var(--amber);
+    font-size:11px; font-weight:800;
+    padding:3px 8px; border-radius:6px;
+    display:flex; align-items:center; gap:4px;
+  }
+  .card .shade{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 55%, transparent 75%);
+  }
+  .card .cardtitle{
+    position:absolute; left:10px; right:10px; bottom:10px;
+    font-family:'Manrope', sans-serif;
+    font-weight:700; font-size:13px;
+    color:#fff;
+    text-shadow:0 2px 6px rgba(0,0,0,0.6);
+  }
+  .card .cardmeta{
+    position:absolute; left:10px; bottom:32px;
+    font-size:10.5px; color:rgba(255,255,255,0.65);
+    font-weight:600;
+  }
+
+  .empty-msg{
+    padding:40px 5vw; color:var(--text-muted); font-size:14px;
+  }
+
+  /* ---------- LOADING TRANSITION ---------- */
+  #loadOverlay{
+    position:fixed; inset:0; z-index:80;
+    background:rgba(6,6,8,0.88);
+    display:none; align-items:center; justify-content:center;
+    flex-direction:column; gap:16px;
+  }
+  #loadOverlay.show{ display:flex; }
+  .spinner{
+    width:56px; height:56px; border-radius:50%;
+    border:3px solid rgba(255,46,69,0.18);
+    border-top-color:var(--red);
+    animation:spin .8s linear infinite;
+  }
+  .scanline{
+    width:180px; height:2px; background:var(--red);
+    box-shadow:0 0 12px 2px rgba(255,46,69,0.7);
+    animation:scan 1s ease-in-out infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @keyframes scan{ 0%,100%{ transform:translateX(-70px); opacity:.3;} 50%{ transform:translateX(70px); opacity:1;} }
+  .loadlabel{ font-family:'Bebas Neue',sans-serif; letter-spacing:3px; font-size:13px; color:var(--text-muted); }
+
+  /* ---------- MODAL ---------- */
+  #modalBg{
+    position:fixed; inset:0; z-index:70;
+    background:rgba(5,5,7,0.72);
+    backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  #modalBg.show{ display:flex; }
+  .modal{
+    width:100%; max-width:860px; max-height:88vh;
+    overflow-y:auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:20px;
+    display:grid; grid-template-columns:280px 1fr;
+    animation:modalIn .28s ease;
+  }
+  @keyframes modalIn{ from{ opacity:0; transform:translateY(14px) scale(.98);} to{ opacity:1; transform:none;} }
+  .modal-poster{ position:relative; min-height:280px; background:var(--surface-hi); }
+  .modal-poster img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .modal-poster .poster-fallback{ height:100%; padding:20px; align-items:flex-end; font-size:26px; }
+  .modal-close{
+    position:absolute; top:12px; right:12px;
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; font-size:16px; cursor:pointer; z-index:2;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .modal-body{ padding:26px 28px; }
+  .modal-cat{ font-size:11px; font-weight:800; letter-spacing:2px; color:var(--red); text-transform:uppercase; }
+  .modal-title{ font-family:'Bebas Neue', sans-serif; font-size:34px; letter-spacing:1px; margin:6px 0 12px; }
+  .modal-stats{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .stat-pill{
+    display:flex; align-items:center; gap:6px;
+    background:var(--surface-hi); border:1px solid var(--line);
+    padding:6px 12px; border-radius:999px; font-size:12.5px; font-weight:700;
+  }
+  .stat-pill.rating{ color:var(--amber); }
+  .modal-synopsis{ color:var(--text-muted); font-size:14.5px; line-height:1.6; margin-bottom:22px; }
+  .ep-head{ font-size:12px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; }
+  .ep-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+  .ep-btn{
+    border:none; cursor:pointer;
+    font-family:'Manrope', sans-serif; font-weight:800; font-size:13px;
+    color:#0a0a0d;
+    padding:11px 16px; border-radius:10px;
+    min-width:64px;
+    transition:transform .15s ease, filter .15s ease;
+  }
+  .ep-btn:hover{ transform:translateY(-3px); filter:brightness(1.08); }
+  .ep-btn small{ display:block; font-weight:600; font-size:10px; opacity:0.75; }
+  .movie-watch-btn{
+    border:none; cursor:pointer; color:#0a0a0d;
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:14px;
+    padding:13px 26px; border-radius:10px;
+    background:var(--red);
+    transition:transform .15s ease, filter .15s ease;
+  }
+  .movie-watch-btn:hover{ transform:translateY(-3px); filter:brightness(1.08); }
+
+  footer{
+    text-align:center; padding:30px 5vw 50px;
+    color:var(--text-muted); font-size:12px;
+    border-top:1px solid var(--line);
+  }
+
+  @media (max-width:640px){
+    header{ gap:14px; }
+    .searchwrap{ order:3; max-width:100%; flex-basis:100%; }
+    .modal{ grid-template-columns:1fr; }
+    .modal-poster{ min-height:200px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" data-text="MAYHEM" onclick="setView('home')"><span>MAYHEM<span class="dot">.</span></span></div>
+  <nav class="mainnav">
+    <button data-view="home" class="active" onclick="setView('home')">Home</button>
+    <button data-view="movies" onclick="setView('movies')">Movies</button>
+    <button data-view="series" onclick="setView('series')">Web Series</button>
+  </nav>
+  <div class="searchwrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="text" placeholder="Search titles..." oninput="renderAll()">
+  </div>
+</header>
+
+<main id="mainContent"></main>
+
+<footer>WEB MAYHEM &mdash; built for best Weekend. ©Anime4u Presents.</footer>
+
+<!-- loading transition -->
+<div id="loadOverlay">
+  <div class="spinner"></div>
+  <div class="scanline"></div>
+  <div class="loadlabel">LOADING TITLE...</div>
+</div>
+
+<!-- detail modal -->
+<div id="modalBg" onclick="if(event.target.id==='modalBg') closeModal();">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+/* =====================================================================
+   ADMIN CONTROL PANEL
+   ---------------------------------------------------------------------
+   Everything the owner needs to edit lives in this one block.
+   Three sections below:
+     1. SITE_SETTINGS   -> logo text, tagline (cosmetic, header/footer)
+     2. MOVIES_DATA     -> every movie shown under "Movies"
+     3. SERIES_DATA     -> every web series shown under "Web Series"
+                           (and on Home, if isLatest: true)
+
+   HOW TO SET A LOGO IMAGE / BACKGROUND IMAGE
+   --------------------------------------------
+     logoUrl        : leave "" to keep the default text logo (site name),
+                       or paste a direct image URL to show a logo image
+                       in the header instead.
+     backgroundUrl  : leave "" to keep the default dark background,
+                       or paste a direct image URL to use it as the
+                       site background instead.
+
+   HOW TO ADD A MOVIE
+   -------------------
+   Copy one {...} block inside MOVIES_DATA and change the values.
+     title      : Movie name shown on the card and popup
+     poster     : leave "" to use an auto-generated colour poster,
+                  or paste a direct image URL (must end in .jpg/.png/.webp)
+     colors     : [colorA, colorB] used ONLY if poster is ""
+     rating     : e.g. "8.4"
+     synopsis   : 1-3 sentence description shown in the popup
+     watchLink  : the URL the big "Watch Movie" button opens
+
+   HOW TO ADD A WEB SERIES
+   ------------------------
+   Same as a movie, plus:
+     season       : e.g. "Season 2"
+     isLatest     : true  -> also appears in the "Latest Series" row on Home
+     episodes     : a list of buttons, one per episode.
+        num   : text on the button, e.g. "1", "E2", "S2E3"
+        label : small text under the number, e.g. "Pilot"
+        link  : the URL that button opens when clicked
+       (episode buttons cycle through the ACCENT_COLORS palette below
+        automatically, so you don't need to set colors per episode)
+
+   That's it — the rest of the file just reads this data and draws
+   the page automatically. You never need to touch anything below
+   the "DO NOT EDIT PAST THIS LINE" marker unless you want to change
+   how the site behaves, not what it shows.
+===================================================================== */
+
+const SITE_SETTINGS = {
+  siteName: "WEB MAYHEM",
+  tagline: "Watch your favorite series here.",
+  logoUrl: "",        // e.g. "https://i.ibb.co/nNsV270r/file-00000000ed8c72079e9d9d5c8e86e885.png"
+  backgroundUrl: "https://i.ibb.co/fGkm3FTM/dark-blue-memphis-facebook-story-background-vector-53876-162121.jpg"   // e.g. "https://i.ibb.co/tpYxMbkz/file-000000005364720787fe128dc5a4fe63.png"
+};
+
+// Colours used for auto-generated posters (when poster:"" ) and for
+// cycling episode-button colours. Add/remove hex codes as you like.
+const ACCENT_COLORS = ["#ff2e45", "#ffb020", "#7c5cff", "#22c7a9", "#ff6f9c", "#4f8dff"];
+
+const MOVIES_DATA = [
+  {
+    title: "The Sheep Detectives",
+    poster: "https://i.ibb.co/PZgRgzHH/images-1.jpg",
+    colors: ["#1f2a48", "#ff2e45"],
+    rating: "9.2",
+    synopsis: "George Hardy is a shepherd who loves to read murder mysteries to his sheep, never suspecting that they can understand him. When George is found dead under mysterious circumstances, the sheep decide to solve the crime themselves, even if it means leaving their meadow for the first time and facing the fact that the human world isn't as simple as it appears in books.",
+    watchLink: "https://gofile.io/d/ODupio"
+  },
+  {
+    title: "Enola Holmes (2020)",
+    poster: "https://i.ibb.co/fVNv7y1L/ems.jpg",
+    colors: ["#301934", "#ffb020"],
+    rating: "6.7",
+    synopsis: "Overshadowed by the legacy of her brothers, an intrepid teenager sets out to prove herself after her mother disappears. While forming unlikely alliances along the way, she discovers her true worth.",
+    watchLink: "https://gofile.io/d/yLrrVR"
+  },
+  {
+    title: "Enola Holmes 2 (2022)",
+    poster: "https://i.ibb.co/JRvryxsf/images-1.jpg",
+    colors: ["#173d3d", "#22c7a9"],
+    rating: "6.8",
+    synopsis: "A washed-up boxing coach takes on one last fighter with nothing left to lose, and neither of them expected to like each other.",
+    watchLink: "https://gofile.io/d/gPKtvB"
+  },
+  {
+    title: "Enola Holmes 3 (2026)",
+    poster: "https://i.ibb.co/vvJSw76x/MV5-BYz-Vh-Nm-Q0-Mz-It-Njg3-Mi00-Mz-M1-LWI5-MDUt-OGZl-MTFj-NTJj-MTM2-Xk-Ey-Xk-Fqc-Gc-V1-QL75-UY562-CR35-0-3.jpg",
+    colors: ["#2a1a3d", "#7c5cff"],
+    rating: "6.1",
+    synopsis: "When Earth's last satellite goes dark, a radio operator picks up a message that changes everything humanity believed about being alone.",
+    watchLink: "https://example.com/watch/last-transmission"
+  },
+  {
+    title: "Project Hail Mary (2026)",
+    poster: "https://i.ibb.co/r2YkZ6Bq/IMG-20260703-230126-999.jpg",
+    colors: ["#402020", "#ff2e45"],
+    rating: "8.0",
+    synopsis: "A crumbling kingdom, a reluctant heir, and the general who has to decide whether loyalty is worth the throne he could take himself.",
+    watchLink: "https://example.com/watch/hollow-crown"
+  },
+  {
+    title: "Fever Line",
+    poster: "",
+    colors: ["#3d1f1f", "#ffb020"],
+    rating: "6.9",
+    synopsis: "A cross-country train, a stranger with no memory, and a storm that keeps getting worse the further they go.",
+    watchLink: "https://example.com/watch/fever-line"
+  },
+  {
+    title: "Concrete Sky",
+    poster: "",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "8.4",
+    synopsis: "An architect discovers her latest tower is being built on top of a city no one is supposed to remember.",
+    watchLink: "https://example.com/watch/concrete-sky"
+  },
+  {
+    title: "The Quiet War",
+    poster: "",
+    colors: ["#241a3d", "#ff6f9c"],
+    rating: "7.4",
+    synopsis: "Two intelligence officers on opposite sides fall into something that looks a lot like trust, right before the ceasefire collapses.",
+    watchLink: "https://example.com/watch/the-quiet-war"
+  }
+];
+
+const SERIES_DATA = [
+  {
+    title: "Spider-Noir",
+    poster: "https://i.ibb.co/zTyPPD2w/images-2.jpg",
+    colors: ["#3d0f1a", "#ff2e45"],
+    rating: "7.8",
+    season: "Season 1",
+    isLatest: true,
+    synopsis: "Ben Reilly, a seasoned, down on his luck private investigator in the 1930s New York, is forced to grapple with his past life, following a deeply personal tragedy, as the city's one and only superhero.",
+    episodes: [
+      { num: "1", label: "Step Into My Office", link: "https://gofile.io/d/LQI3XG" },
+      { num: "2", label: "Tread Lightly", link: "https://gofile.io/d/2ranO5" },
+      { num: "3", label: "Double Cross", link: "https://gofile.io/d/EaNBFd" },
+      { num: "4", label: "A Mistake I'll Never Make Again", link: "https://gofile.io/d/bWZPzt" },
+      { num: "5", label: "Betrayal", link: "https://gofile.io/d/OSYhLM" },
+      { num: "6", label: "Nightmare On A Gurney", link: "https://gofile.io/d/zh5dJ2" },
+      { num: "7", label: "Nobody's Hero", link: "https://gofile.io/d/Cn1tkM" },
+      { num: "8", label: "The Man In The Mask", link: "https://gofile.io/d/Sq3X0N" }
+    ]
+  },
+  {
+    title: "Static Order",
+    poster: "",
+    colors: ["#1a1a3d", "#7c5cff"],
+    rating: "8.1",
+    season: "Season 1",
+    isLatest: true,
+    synopsis: "Six strangers wake up inside the same recurring dream, and one of them isn't supposed to be there.",
+    episodes: [
+      { num: "1", label: "Wake Up", link: "https://example.com/watch/static-order/s1e1" },
+      { num: "2", label: "The Sixth", link: "https://example.com/watch/static-order/s1e2" },
+      { num: "3", label: "Signal", link: "https://example.com/watch/static-order/s1e3" }
+    ]
+  },
+  {
+    title: "Iron Ghosts",
+    poster: "",
+    colors: ["#2a2a2a", "#ffb020"],
+    rating: "7.8",
+    season: "Season 2",
+    isLatest: true,
+    synopsis: "A retired mech pilot is dragged back into a war she thought she ended, this time to fight machines wearing her old squad's faces.",
+    episodes: [
+      { num: "1", label: "Rust", link: "https://example.com/watch/iron-ghosts/s2e1" },
+      { num: "2", label: "Recall", link: "https://example.com/watch/iron-ghosts/s2e2" },
+      { num: "3", label: "Old Colors", link: "https://example.com/watch/iron-ghosts/s2e3" },
+      { num: "4", label: "Wreckage", link: "https://example.com/watch/iron-ghosts/s2e4" },
+      { num: "5", label: "Reactivate", link: "https://example.com/watch/iron-ghosts/s2e5" }
+    ]
+  },
+  {
+    title: "Neon Requiem",
+    poster: "",
+    colors: ["#3d1a3d", "#22c7a9"],
+    rating: "8.9",
+    season: "Season 1",
+    isLatest: true,
+    synopsis: "In a city that never turns its lights off, a composer's last unfinished symphony holds the code to everyone's memories.",
+    episodes: [
+      { num: "1", label: "First Note", link: "https://example.com/watch/neon-requiem/s1e1" },
+      { num: "2", label: "Interval", link: "https://example.com/watch/neon-requiem/s1e2" },
+      { num: "3", label: "Coda", link: "https://example.com/watch/neon-requiem/s1e3" }
+    ]
+  },
+  {
+    title: "Velvet Circuit",
+    poster: "",
+    colors: ["#1a3d2a", "#ff6f9c"],
+    rating: "7.5",
+    season: "Season 4",
+    isLatest: false,
+    synopsis: "A poker dealer with a photographic memory gets pulled into the biggest underground circuit the city has ever run.",
+    episodes: [
+      { num: "1", label: "Buy-In", link: "https://example.com/watch/velvet-circuit/s4e1" },
+      { num: "2", label: "The Tell", link: "https://example.com/watch/velvet-circuit/s4e2" }
+    ]
+  },
+  {
+    title: "Ash & Ember",
+    poster: "",
+    colors: ["#3d2a1a", "#ff2e45"],
+    rating: "8.3",
+    season: "Season 2",
+    isLatest: false,
+    synopsis: "Two sisters on opposite sides of a wildfire-ravaged border have to work together to get their family out alive.",
+    episodes: [
+      { num: "1", label: "Smoke Line", link: "https://example.com/watch/ash-ember/s2e1" },
+      { num: "2", label: "Backdraft", link: "https://example.com/watch/ash-ember/s2e2" },
+      { num: "3", label: "Embers", link: "https://example.com/watch/ash-ember/s2e3" }
+    ]
+  },
+  {
+    title: "The Long Static",
+    poster: "",
+    colors: ["#0f2a3d", "#ffb020"],
+    rating: "7.2",
+    season: "Season 1",
+    isLatest: false,
+    synopsis: "A submarine crew loses contact with the surface, and the silence on the radio starts to feel like it's listening back.",
+    episodes: [
+      { num: "1", label: "Depth", link: "https://example.com/watch/long-static/s1e1" },
+      { num: "2", label: "Pressure", link: "https://example.com/watch/long-static/s1e2" }
+    ]
+  },
+  {
+    title: "Wolfline",
+    poster: "",
+    colors: ["#2a1f3d", "#4f8dff"],
+    rating: "8.0",
+    season: "Season 3",
+    isLatest: false,
+    synopsis: "A border-town sheriff hunts a pattern of disappearances that only happen on the nights of a full moon.",
+    episodes: [
+      { num: "1", label: "Full Moon", link: "https://example.com/watch/wolfline/s3e1" },
+      { num: "2", label: "Tracks", link: "https://example.com/watch/wolfline/s3e2" },
+      { num: "3", label: "Den", link: "https://example.com/watch/wolfline/s3e3" }
+    ]
+  }
+];
+
+/* =====================================================================
+   DO NOT EDIT PAST THIS LINE
+   (this part just renders the page using the data above)
+===================================================================== */
+
+document.title = SITE_SETTINGS.siteName;
+
+const logoEl = document.querySelector('.logo');
+if(SITE_SETTINGS.logoUrl){
+  logoEl.classList.add('has-image');
+  logoEl.removeAttribute('data-text');
+  logoEl.innerHTML = `<img src="${SITE_SETTINGS.logoUrl}" alt="${SITE_SETTINGS.siteName}">`;
+} else {
+  logoEl.setAttribute('data-text', SITE_SETTINGS.siteName);
+  logoEl.innerHTML = `<span>${SITE_SETTINGS.siteName}<span class="dot">.</span></span>`;
+}
+
+if(SITE_SETTINGS.backgroundUrl){
+  document.body.classList.add('has-bg-image');
+  document.body.style.backgroundImage = `linear-gradient(rgba(10,10,13,0.78), rgba(10,10,13,0.9)), url('${SITE_SETTINGS.backgroundUrl}')`;
+}
+
+let currentView = 'home';
+
+function setView(view){
+  currentView = view;
+  document.querySelectorAll('nav.mainnav button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+  renderAll();
+}
+
+function posterInner(item){
+  if(item.poster){
+    return `<img src="${item.poster}" alt="${item.title}" loading="lazy">`;
+  }
+  const [c1,c2] = item.colors && item.colors.length ? item.colors : ["#1f1f26","#ff2e45"];
+  return `<div class="poster-fallback" style="background:linear-gradient(155deg, ${c1}, ${c2});">${item.title}</div>`;
+}
+
+function cardHTML(item, kind, idx){
+  const meta = kind === 'series' ? item.season : (item.episodes ? '' : 'Movie');
+  return `
+    <div class="card" onclick="openTitle('${kind}', ${idx})">
+      ${posterInner(item)}
+      <div class="badge">★ ${item.rating}</div>
+      <div class="shade"></div>
+      ${meta ? `<div class="cardmeta">${meta}</div>` : ''}
+      <div class="cardtitle">${item.title}</div>
+    </div>`;
+}
+
+function railHTML(id, eyebrow, title, items, kind){
+  if(!items.length) return '';
+  const cards = items.map((it)=>{
+    const realIdx = kind==='series' ? SERIES_DATA.indexOf(it) : MOVIES_DATA.indexOf(it);
+    return cardHTML(it, kind, realIdx);
+  }).join('');
+  return `
+    <section class="rail-section">
+      <div class="rail-head">
+        <div>
+          <span class="rail-eyebrow">${eyebrow}</span>
+          <span class="rail-title">${title}</span>
+        </div>
+        <div class="rail-arrows">
+          <button onclick="scrollRail('${id}', -1)">&#8592;</button>
+          <button onclick="scrollRail('${id}', 1)">&#8594;</button>
+        </div>
+      </div>
+      <div class="rail-track" id="${id}">${cards}</div>
+    </section>`;
+}
+
+function scrollRail(id, dir){
+  const track = document.getElementById(id);
+  if(track) track.scrollBy({ left: dir * 520, behavior: 'smooth' });
+}
+
+function matchesSearch(item, q){
+  return !q || item.title.toLowerCase().includes(q);
+}
+
+function renderAll(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const main = document.getElementById('mainContent');
+
+  const latest = SERIES_DATA.filter(s => s.isLatest && matchesSearch(s, q));
+  const movies = MOVIES_DATA.filter(m => matchesSearch(m, q));
+  const series = SERIES_DATA.filter(s => matchesSearch(s, q));
+
+  let html = '';
+
+  if(currentView === 'home'){
+    html += railHTML('rail-latest', 'New This Week', 'Latest Series', latest, 'series');
+    html += railHTML('rail-home-movies', 'Trending', 'Movies', movies, 'movies');
+    html += railHTML('rail-home-series', 'Binge Worthy', 'Web Series', series, 'series');
+  } else if(currentView === 'movies'){
+    html += railHTML('rail-movies', 'Full Catalogue', 'Movies', movies, 'movies');
+  } else if(currentView === 'series'){
+    html += railHTML('rail-series', 'Full Catalogue', 'Web Series', series, 'series');
+  }
+
+  if(!html){
+    html = `<div class="empty-msg">Nothing matches "${q}". Try another title.</div>`;
+  }
+  main.innerHTML = html;
+}
+
+function openTitle(kind, idx){
+  const item = kind === 'series' ? SERIES_DATA[idx] : MOVIES_DATA[idx];
+  const overlay = document.getElementById('loadOverlay');
+  overlay.classList.add('show');
+  setTimeout(()=>{
+    overlay.classList.remove('show');
+    showModal(item, kind);
+  }, 700);
+}
+
+function showModal(item, kind){
+  const modal = document.getElementById('modalContent');
+  const posterBlock = item.poster
+    ? `<img src="${item.poster}" alt="${item.title}">`
+    : (()=>{ const [c1,c2] = item.colors||["#1f1f26","#ff2e45"];
+        return `<div class="poster-fallback" style="background:linear-gradient(155deg, ${c1}, ${c2}); height:100%;">${item.title}</div>`; })();
+
+  const statPills = `
+    <div class="stat-pill rating">★ ${item.rating}</div>
+    ${kind === 'series' ? `<div class="stat-pill">${item.season}</div>` : ''}
+    ${kind === 'series' ? `<div class="stat-pill">${item.episodes.length} Episodes</div>` : `<div class="stat-pill">Movie</div>`}
+  `;
+
+  let actionBlock = '';
+  if(kind === 'series'){
+    const buttons = item.episodes.map((ep, i)=>{
+      const color = ACCENT_COLORS[i % ACCENT_COLORS.length];
+      return `<button class="ep-btn" style="background:${color};" onclick="window.open('${ep.link}', '_blank')">
+                ${ep.num}<small>${ep.label}</small>
+              </button>`;
+    }).join('');
+    actionBlock = `
+      <div class="ep-head">Episodes</div>
+      <div class="ep-grid">${buttons}</div>`;
+  } else {
+    actionBlock = `<button class="movie-watch-btn" onclick="window.open('${item.watchLink}', '_blank')">▶ Watch Movie</button>`;
+  }
+
+  modal.innerHTML = `
+    <div class="modal-poster">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      ${posterBlock}
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat">${kind === 'series' ? 'Web Series' : 'Movie'}</div>
+      <div class="modal-title">${item.title}</div>
+      <div class="modal-stats">${statPills}</div>
+      <div class="modal-synopsis">${item.synopsis}</div>
+      ${actionBlock}
+    </div>`;
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('show');
+}
+
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+
+renderAll();
+</script>
+</body>
+</html>
