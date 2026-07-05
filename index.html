@@ -73,6 +73,39 @@
     display:block; height:38px; width:auto; max-width:220px;
     object-fit:contain;
   }
+  .logo-group{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .glitch-badge{
+    position:relative;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:15px;
+    letter-spacing:1.5px;
+    color:var(--text);
+    text-transform:uppercase;
+    line-height:1;
+    padding:6px 12px;
+    border:1px solid rgba(255,46,69,0.4);
+    border-radius:6px;
+    background:rgba(255,46,69,0.08);
+    user-select:none;
+    white-space:nowrap;
+    animation:badgePulse 2.4s ease-in-out infinite;
+  }
+  .glitch-badge::before, .glitch-badge::after{
+    content:attr(data-text);
+    position:absolute; left:12px; top:6px;
+  }
+  .glitch-badge::before{ color:var(--red); opacity:0.65; z-index:-1; animation:glitchShift 3.4s infinite; }
+  .glitch-badge::after{ color:var(--amber); opacity:0.55; z-index:-2; animation:glitchShift 2.6s infinite reverse; }
+  @keyframes glitchShift{
+    0%,100%{ transform:translate(-2px,1px); }
+    45%{ transform:translate(2px,-1px); }
+    50%{ transform:translate(-1px,2px); }
+    55%{ transform:translate(1px,-2px); }
+  }
+  @keyframes badgePulse{
+    0%,100%{ box-shadow:0 0 0 rgba(255,46,69,0); }
+    50%{ box-shadow:0 0 14px rgba(255,46,69,0.35); }
+  }
 
   nav.mainnav{
     display:flex; gap:6px;
@@ -121,6 +154,41 @@
   }
   .searchwrap input:focus{ border-color:var(--red); background:var(--surface-hi); }
   .searchwrap input::placeholder{ color:var(--text-muted); }
+
+  /* ---------- SEARCH MASCOT ---------- */
+  .mascotwrap{
+    position:absolute; top:calc(100% + 12px); right:0;
+    display:flex; align-items:flex-end; gap:10px;
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .22s ease, transform .22s ease, visibility .22s;
+    z-index:45;
+  }
+  .mascotwrap.show{ opacity:1; visibility:visible; transform:translateY(0); }
+  .mascot-bubble{
+    background:var(--surface-hi);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-size:13px; font-weight:600;
+    padding:10px 14px; border-radius:14px 14px 4px 14px;
+    max-width:190px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.45);
+  }
+  .mascot-imgwrap{
+    width:52px; height:52px; border-radius:50%;
+    flex:0 0 auto; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--surface);
+    font-size:26px;
+    animation:mascotGlow 1.8s ease-in-out infinite;
+  }
+  .mascot-imgwrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  @keyframes mascotGlow{
+    0%,100%{ box-shadow:0 0 8px 2px rgba(124,92,255,0.45); }
+    50%{ box-shadow:0 0 18px 6px rgba(124,92,255,0.85); }
+  }
+  @media (max-width:640px){
+    .mascotwrap{ right:auto; left:0; }
+  }
 
   /* ---------- MAIN / RAILS ---------- */
   main{ padding:36px 0 90px; }
@@ -311,7 +379,10 @@
 <body>
 
 <header>
-  <div class="logo" data-text="MAYHEM" onclick="setView('home')"><span>MAYHEM<span class="dot">.</span></span></div>
+  <div class="logo-group">
+    <div class="logo" data-text="MAYHEM" onclick="setView('home')"><span>MAYHEM<span class="dot">.</span></span></div>
+    <div class="glitch-badge" id="eventBadge" data-text=""></div>
+  </div>
   <nav class="mainnav">
     <button data-view="home" class="active" onclick="setView('home')">Home</button>
     <button data-view="movies" onclick="setView('movies')">Movies</button>
@@ -320,6 +391,10 @@
   <div class="searchwrap">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input id="searchInput" type="text" placeholder="Search titles..." oninput="renderAll()">
+    <div class="mascotwrap" id="mascotWrap">
+      <div class="mascot-imgwrap" id="mascotImgWrap"></div>
+      <div class="mascot-bubble" id="mascotBubble"></div>
+    </div>
   </div>
 </header>
 
@@ -359,6 +434,21 @@
                        or paste a direct image URL to use it as the
                        site background instead.
 
+   HOW TO CHANGE THE EVENT BADGE (e.g. "X MARVEL MONTH")
+   --------------------------------------------------------
+     eventBadgeText : the little glitch-font tag shown next to the logo.
+                       Change it to anything, anytime, e.g. "X HORROR MONTH"
+                       or "X ANIME WEEK". Set it to "" to hide it completely.
+
+   HOW TO SET UP THE SEARCH-BAR MASCOT
+   --------------------------------------------
+     mascotImageUrl : leave "" to show a default emoji mascot, or paste a
+                       direct image URL to show your own character instead.
+                       It glows automatically.
+     mascotGreeting : the text shown in the speech bubble when someone
+                       taps/focuses the search bar. Change it to whatever
+                       you want the character to say.
+
    HOW TO ADD A MOVIE
    -------------------
    Copy one {...} block inside MOVIES_DATA and change the values.
@@ -392,7 +482,12 @@ const SITE_SETTINGS = {
   siteName: "WEB MAYHEM",
   tagline: "Watch your favorite series here.",
   logoUrl: "https://i.ibb.co/vv6YCjnK/IMG-20260705-221247-893-removebg-preview.png",        // e.g. "https://i.ibb.co/nNsV270r/file-00000000ed8c72079e9d9d5c8e86e885.png"
-  backgroundUrl: "https://i.ibb.co/fGkm3FTM/dark-blue-memphis-facebook-story-background-vector-53876-162121.jpg"   // e.g. "https://i.ibb.co/tpYxMbkz/file-000000005364720787fe128dc5a4fe63.png"
+  backgroundUrl: "https://i.ibb.co/fGkm3FTM/dark-blue-memphis-facebook-story-background-vector-53876-162121.jpg",   // e.g. "https://i.ibb.co/tpYxMbkz/file-000000005364720787fe128dc5a4fe63.png"
+
+  eventBadgeText: "X MARVEL MONTH",   // glitch-font tag next to the logo. Change anytime, or set to "" to hide it.
+
+  mascotImageUrl: "",   // paste a direct image URL for the search mascot; leave "" for a default emoji mascot
+  mascotGreeting: "Hi! Are you searching something?"   // text the mascot says when the search bar is tapped/focused
 };
 
 // Colours used for auto-generated posters (when poster:"" ) and for
@@ -614,6 +709,28 @@ if(SITE_SETTINGS.backgroundUrl){
   document.body.classList.add('has-bg-image');
   document.body.style.backgroundImage = `linear-gradient(rgba(10,10,13,0.78), rgba(10,10,13,0.9)), url('${SITE_SETTINGS.backgroundUrl}')`;
 }
+
+const badgeEl = document.getElementById('eventBadge');
+if(SITE_SETTINGS.eventBadgeText && SITE_SETTINGS.eventBadgeText.trim()){
+  badgeEl.setAttribute('data-text', SITE_SETTINGS.eventBadgeText);
+  badgeEl.textContent = SITE_SETTINGS.eventBadgeText;
+  badgeEl.style.display = '';
+} else {
+  badgeEl.style.display = 'none';
+}
+
+const mascotWrap = document.getElementById('mascotWrap');
+const mascotImgWrap = document.getElementById('mascotImgWrap');
+const mascotBubble = document.getElementById('mascotBubble');
+const searchInputEl = document.getElementById('searchInput');
+
+mascotImgWrap.innerHTML = SITE_SETTINGS.mascotImageUrl
+  ? `<img src="${SITE_SETTINGS.mascotImageUrl}" alt="mascot">`
+  : `👋`;
+mascotBubble.textContent = SITE_SETTINGS.mascotGreeting || "Hi! Are you searching something?";
+
+searchInputEl.addEventListener('focus', ()=> mascotWrap.classList.add('show'));
+searchInputEl.addEventListener('blur', ()=> setTimeout(()=> mascotWrap.classList.remove('show'), 150));
 
 let currentView = 'home';
 
