@@ -278,6 +278,24 @@
     padding:40px 5vw; color:var(--text-muted); font-size:14px;
   }
 
+  /* ---------- EVENT CARDS ---------- */
+  .event-card{
+    position:relative; flex:0 0 auto;
+    width:280px; height:150px; border-radius:14px;
+    overflow:hidden; cursor:pointer;
+    background-size:cover; background-position:center;
+    border:1px solid var(--line);
+    scroll-snap-align:start;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .event-card:hover{ transform:translateY(-6px); box-shadow:0 18px 34px rgba(0,0,0,0.5); }
+  .event-cardtitle{
+    position:absolute; left:14px; right:14px; bottom:12px;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:20px; letter-spacing:0.5px;
+    color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.6);
+  }
+
   /* ---------- LOADING TRANSITION ---------- */
   #loadOverlay{
     position:fixed; inset:0; z-index:80;
@@ -302,14 +320,14 @@
   .loadlabel{ font-family:'Bebas Neue',sans-serif; letter-spacing:3px; font-size:13px; color:var(--text-muted); }
 
   /* ---------- MODAL ---------- */
-  #modalBg{
+  #modalBg, #eventModalBg{
     position:fixed; inset:0; z-index:70;
     background:rgba(5,5,7,0.72);
     backdrop-filter:blur(6px);
     display:none; align-items:center; justify-content:center;
     padding:24px;
   }
-  #modalBg.show{ display:flex; }
+  #modalBg.show, #eventModalBg.show{ display:flex; }
   .modal{
     width:100%; max-width:860px; max-height:88vh;
     overflow-y:auto;
@@ -362,6 +380,16 @@
   }
   .movie-watch-btn:hover{ transform:translateY(-3px); filter:brightness(1.08); }
 
+  /* ---------- EVENT MODAL ---------- */
+  .event-modal{ grid-template-columns:1fr; }
+  .event-banner{
+    position:relative; height:210px;
+    background-size:cover; background-position:center;
+  }
+  .event-modal .modal-body{ padding-top:22px; }
+  .event-modal .rail-track{ padding:6px 0 10px; margin:0 -4px; }
+  .event-modal .ep-head{ margin-top:20px; }
+
   footer{
     text-align:center; padding:30px 5vw 50px;
     color:var(--text-muted); font-size:12px;
@@ -387,6 +415,7 @@
     <button data-view="home" class="active" onclick="setView('home')">Home</button>
     <button data-view="movies" onclick="setView('movies')">Movies</button>
     <button data-view="series" onclick="setView('series')">Web Series</button>
+    <button data-view="events" onclick="setView('events')">Events</button>
   </nav>
   <div class="searchwrap">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -414,15 +443,22 @@
   <div class="modal" id="modalContent"></div>
 </div>
 
+<!-- event modal -->
+<div id="eventModalBg" onclick="if(event.target.id==='eventModalBg') closeEventModal();">
+  <div class="modal event-modal" id="eventModalContent"></div>
+</div>
+
 <script>
 /* =====================================================================
    ADMIN CONTROL PANEL
    ---------------------------------------------------------------------
    Everything the owner needs to edit lives in this one block.
-   Three sections below:
+   Four sections below:
      1. SITE_SETTINGS   -> logo text, tagline (cosmetic, header/footer)
-     2. MOVIES_DATA     -> every movie shown under "Movies"
-     3. SERIES_DATA     -> every web series shown under "Web Series"
+     2. EVENTS_DATA      -> events shown in the "Events" row/page, each
+                            linked to whichever movies/series you choose
+     3. MOVIES_DATA     -> every movie shown under "Movies"
+     4. SERIES_DATA     -> every web series shown under "Web Series"
                            (and on Home, if isLatest: true)
 
    HOW TO SET A LOGO IMAGE / BACKGROUND IMAGE
@@ -448,6 +484,23 @@
      mascotGreeting : the text shown in the speech bubble when someone
                        taps/focuses the search bar. Change it to whatever
                        you want the character to say.
+
+   HOW TO ADD AN EVENT
+   -------------------
+   Copy one {...} block inside EVENTS_DATA and change the values.
+     title       : Event name shown on the banner card and popup
+                   (e.g. "Marvel Month")
+     image       : leave "" to use an auto-generated colour banner,
+                   or paste a direct image URL
+     colors      : [colorA, colorB] used ONLY if image is ""
+     description : 1-3 sentence blurb shown when the event is opened
+     movies      : array of exact MOVIES_DATA titles to link to this
+                   event, e.g. ["Enola Holmes (2020)", "Fever Line"]
+     series      : array of exact SERIES_DATA titles to link to this
+                   event, e.g. ["Spider-Noir"]
+   Titles must match the "title" field of a movie/series exactly
+   (copy-paste it) for the link to work. Tapping the event on the site
+   opens a popup showing every movie/series you listed here.
 
    HOW TO ADD A MOVIE
    -------------------
@@ -493,6 +546,17 @@ const SITE_SETTINGS = {
 // Colours used for auto-generated posters (when poster:"" ) and for
 // cycling episode-button colours. Add/remove hex codes as you like.
 const ACCENT_COLORS = ["#ff2e45", "#ffb020", "#7c5cff", "#22c7a9", "#ff6f9c", "#4f8dff"];
+
+const EVENTS_DATA = [
+  {
+    title: "Marvel Month",
+    image: "",
+    colors: ["#3d0f1a", "#ff2e45"],
+    description: "A month-long lineup of hand-picked movies and series, all in one place. Tap a title below to jump straight to it.",
+    movies: ["Project Hail Mary (2026)"],
+    series: ["Spider-Noir"]
+  }
+];
 
 const MOVIES_DATA = [
   {
@@ -762,12 +826,42 @@ function cardHTML(item, kind, idx){
     </div>`;
 }
 
+function eventCardHTML(ev, idx){
+  const bg = ev.image
+    ? `background-image:url('${ev.image}');`
+    : `background-image:linear-gradient(155deg, ${(ev.colors&&ev.colors[0])||'#1f1f26'}, ${(ev.colors&&ev.colors[1])||'#ff2e45'});`;
+  return `
+    <div class="event-card" style="${bg}" onclick="openEvent(${idx})">
+      <div class="shade"></div>
+      <div class="event-cardtitle">${ev.title}</div>
+    </div>`;
+}
+
 function railHTML(id, eyebrow, title, items, kind){
   if(!items.length) return '';
   const cards = items.map((it)=>{
     const realIdx = kind==='series' ? SERIES_DATA.indexOf(it) : MOVIES_DATA.indexOf(it);
     return cardHTML(it, kind, realIdx);
   }).join('');
+  return `
+    <section class="rail-section">
+      <div class="rail-head">
+        <div>
+          <span class="rail-eyebrow">${eyebrow}</span>
+          <span class="rail-title">${title}</span>
+        </div>
+        <div class="rail-arrows">
+          <button onclick="scrollRail('${id}', -1)">&#8592;</button>
+          <button onclick="scrollRail('${id}', 1)">&#8594;</button>
+        </div>
+      </div>
+      <div class="rail-track" id="${id}">${cards}</div>
+    </section>`;
+}
+
+function eventsRailHTML(id, eyebrow, title, items){
+  if(!items.length) return '';
+  const cards = items.map((ev)=> eventCardHTML(ev, EVENTS_DATA.indexOf(ev))).join('');
   return `
     <section class="rail-section">
       <div class="rail-head">
@@ -800,10 +894,12 @@ function renderAll(){
   const latest = SERIES_DATA.filter(s => s.isLatest && matchesSearch(s, q));
   const movies = MOVIES_DATA.filter(m => matchesSearch(m, q));
   const series = SERIES_DATA.filter(s => matchesSearch(s, q));
+  const events = EVENTS_DATA.filter(e => matchesSearch(e, q));
 
   let html = '';
 
   if(currentView === 'home'){
+    html += eventsRailHTML('rail-events', 'Featured', 'Events', events);
     html += railHTML('rail-latest', 'New This Week', 'Latest Series', latest, 'series');
     html += railHTML('rail-home-movies', 'Trending', 'Movies', movies, 'movies');
     html += railHTML('rail-home-series', 'Binge Worthy', 'Web Series', series, 'series');
@@ -811,6 +907,8 @@ function renderAll(){
     html += railHTML('rail-movies', 'Full Catalogue', 'Movies', movies, 'movies');
   } else if(currentView === 'series'){
     html += railHTML('rail-series', 'Full Catalogue', 'Web Series', series, 'series');
+  } else if(currentView === 'events'){
+    html += eventsRailHTML('rail-events-full', 'Full Catalogue', 'Events', events);
   }
 
   if(!html){
@@ -876,7 +974,52 @@ function closeModal(){
   document.getElementById('modalBg').classList.remove('show');
 }
 
-document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+function openEvent(idx){
+  const ev = EVENTS_DATA[idx];
+  const overlay = document.getElementById('loadOverlay');
+  overlay.classList.add('show');
+  setTimeout(()=>{
+    overlay.classList.remove('show');
+    showEventModal(ev);
+  }, 700);
+}
+
+function showEventModal(ev){
+  const modal = document.getElementById('eventModalContent');
+  const bannerStyle = ev.image
+    ? `background-image:url('${ev.image}');`
+    : `background-image:linear-gradient(155deg, ${(ev.colors&&ev.colors[0])||'#1f1f26'}, ${(ev.colors&&ev.colors[1])||'#ff2e45'});`;
+
+  const linkedMovies = MOVIES_DATA
+    .map((m, i)=>({ item:m, i }))
+    .filter(({item}) => (ev.movies||[]).includes(item.title));
+  const linkedSeries = SERIES_DATA
+    .map((s, i)=>({ item:s, i }))
+    .filter(({item}) => (ev.series||[]).includes(item.title));
+
+  const movieCards = linkedMovies.map(({item,i}) => cardHTML(item, 'movies', i)).join('');
+  const seriesCards = linkedSeries.map(({item,i}) => cardHTML(item, 'series', i)).join('');
+
+  modal.innerHTML = `
+    <div class="event-banner" style="${bannerStyle}">
+      <button class="modal-close" onclick="closeEventModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat">Event</div>
+      <div class="modal-title">${ev.title}</div>
+      <div class="modal-synopsis">${ev.description||''}</div>
+      ${movieCards ? `<div class="ep-head">Movies In This Event</div><div class="rail-track">${movieCards}</div>` : ''}
+      ${seriesCards ? `<div class="ep-head">Web Series In This Event</div><div class="rail-track">${seriesCards}</div>` : ''}
+      ${(!movieCards && !seriesCards) ? `<div class="empty-msg" style="padding:0;">No titles linked to this event yet.</div>` : ''}
+    </div>`;
+  document.getElementById('eventModalBg').classList.add('show');
+}
+
+function closeEventModal(){
+  document.getElementById('eventModalBg').classList.remove('show');
+}
+
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ closeModal(); closeEventModal(); } });
 
 renderAll();
 </script>
