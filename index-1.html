@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAYHEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0d;
+    --surface:#151419;
+    --surface-hi:#1e1c24;
+    --text:#f5f3ee;
+    --text-muted:#8d8a94;
+    --red:#ff2e45;
+    --amber:#ffb020;
+    --violet:#7c5cff;
+    --teal:#22c7a9;
+    --line:rgba(245,243,238,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Manrope', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--red); color:#fff; }
+  body.has-bg-image{
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    background-repeat:no-repeat;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; gap:28px;
+    padding:16px 5vw;
+    background:rgba(10,10,13,0.86);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .logo{
+    position:relative;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:34px;
+    letter-spacing:2px;
+    color:var(--text);
+    text-transform:uppercase;
+    line-height:1;
+    cursor:pointer;
+    user-select:none;
+    filter:drop-shadow(0 0 18px rgba(255,46,69,0.25));
+  }
+  .logo span{ position:relative; display:inline-block; clip-path:polygon(0 0,100% 0,96% 100%,2% 100%); }
+  .logo::before, .logo::after{
+    content:attr(data-text);
+    position:absolute; left:0; top:0;
+    clip-path:polygon(0 0,100% 0,96% 100%,2% 100%);
+  }
+  .logo::before{ color:var(--red); transform:translate(-2px,1px); opacity:0.65; z-index:-1; }
+  .logo::after{ color:var(--violet); transform:translate(2px,-1px); opacity:0.5; z-index:-2; }
+  .logo .dot{ color:var(--red); }
+  .logo.has-image{ filter:none; }
+  .logo.has-image::before, .logo.has-image::after{ content:none; }
+  .logo.has-image img{
+    display:block; height:38px; width:auto; max-width:220px;
+    object-fit:contain;
+  }
+  .logo-group{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .glitch-badge{
+    position:relative;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:15px;
+    letter-spacing:1.5px;
+    color:var(--text);
+    text-transform:uppercase;
+    line-height:1;
+    padding:6px 12px;
+    border:1px solid rgba(255,46,69,0.4);
+    border-radius:6px;
+    background:rgba(255,46,69,0.08);
+    user-select:none;
+    white-space:nowrap;
+    animation:badgePulse 2.4s ease-in-out infinite;
+  }
+  .glitch-badge::before, .glitch-badge::after{
+    content:attr(data-text);
+    position:absolute; left:12px; top:6px;
+  }
+  .glitch-badge::before{ color:var(--red); opacity:0.65; z-index:-1; animation:glitchShift 3.4s infinite; }
+  .glitch-badge::after{ color:var(--amber); opacity:0.55; z-index:-2; animation:glitchShift 2.6s infinite reverse; }
+  @keyframes glitchShift{
+    0%,100%{ transform:translate(-2px,1px); }
+    45%{ transform:translate(2px,-1px); }
+    50%{ transform:translate(-1px,2px); }
+    55%{ transform:translate(1px,-2px); }
+  }
+  @keyframes badgePulse{
+    0%,100%{ box-shadow:0 0 0 rgba(255,46,69,0); }
+    50%{ box-shadow:0 0 14px rgba(255,46,69,0.35); }
+  }
+
+  nav.mainnav{
+    display:flex; gap:6px;
+    background:var(--surface);
+    padding:5px; border-radius:999px;
+    border:1px solid var(--line);
+  }
+  nav.mainnav button{
+    font-family:'Manrope', sans-serif;
+    font-weight:700; font-size:13px;
+    letter-spacing:0.4px;
+    padding:9px 18px;
+    border-radius:999px;
+    border:none; background:transparent;
+    color:var(--text-muted);
+    cursor:pointer;
+    transition:all .2s ease;
+  }
+  nav.mainnav button:hover{ color:var(--text); }
+  nav.mainnav button.active{
+    background:var(--red); color:#fff;
+    box-shadow:0 4px 16px rgba(255,46,69,0.35);
+  }
+
+  .searchwrap{
+    margin-left:auto;
+    position:relative;
+    min-width:220px;
+    flex:1; max-width:340px;
+  }
+  .searchwrap svg{
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    width:16px; height:16px; stroke:var(--text-muted);
+  }
+  .searchwrap input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'Manrope', sans-serif;
+    font-size:14px;
+    padding:11px 14px 11px 38px;
+    border-radius:999px;
+    outline:none;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .searchwrap input:focus{ border-color:var(--red); background:var(--surface-hi); }
+  .searchwrap input::placeholder{ color:var(--text-muted); }
+
+  /* ---------- SEARCH MASCOT ---------- */
+  .mascotwrap{
+    position:absolute; top:calc(100% + 12px); right:0;
+    display:flex; align-items:flex-end; gap:10px;
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .22s ease, transform .22s ease, visibility .22s;
+    z-index:45;
+  }
+  .mascotwrap.show{ opacity:1; visibility:visible; transform:translateY(0); }
+  .mascot-bubble{
+    background:var(--surface-hi);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-size:13px; font-weight:600;
+    padding:10px 14px; border-radius:14px 14px 4px 14px;
+    max-width:190px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.45);
+  }
+  .mascot-imgwrap{
+    width:52px; height:52px; border-radius:50%;
+    flex:0 0 auto; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--surface);
+    font-size:26px;
+    animation:mascotGlow 1.8s ease-in-out infinite;
+  }
+  .mascot-imgwrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  @keyframes mascotGlow{
+    0%,100%{ box-shadow:0 0 8px 2px rgba(124,92,255,0.45); }
+    50%{ box-shadow:0 0 18px 6px rgba(124,92,255,0.85); }
+  }
+  @media (max-width:640px){
+    .mascotwrap{ right:auto; left:0; }
+  }
+
+  /* ---------- MAIN / RAILS ---------- */
+  main{ padding:36px 0 90px; }
+  .rail-section{ margin-bottom:44px; }
+  .rail-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding:0 5vw; margin-bottom:16px;
+  }
+  .rail-eyebrow{
+    font-size:11px; font-weight:800; letter-spacing:2.5px;
+    color:var(--red); text-transform:uppercase;
+    display:block; margin-bottom:4px;
+  }
+  .rail-title{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:30px; letter-spacing:1px;
+    color:var(--text);
+  }
+  .rail-arrows{ display:flex; gap:8px; }
+  .rail-arrows button{
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--line); background:var(--surface);
+    color:var(--text); cursor:pointer; font-size:16px;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease, transform .15s ease;
+  }
+  .rail-arrows button:hover{ background:var(--surface-hi); transform:scale(1.06); }
+
+  .rail-track{
+    display:flex; gap:16px;
+    overflow-x:auto; scroll-snap-type:x proximity;
+    padding:6px 5vw 14px;
+    scrollbar-width:none;
+  }
+  .rail-track::-webkit-scrollbar{ display:none; }
+
+  .card{
+    position:relative;
+    flex:0 0 auto;
+    width:180px; aspect-ratio:2/3;
+    border-radius:14px;
+    overflow:hidden;
+    cursor:pointer;
+    scroll-snap-align:start;
+    background:var(--surface);
+    border:1px solid var(--line);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .card:hover{ transform:translateY(-6px); box-shadow:0 18px 34px rgba(0,0,0,0.5); }
+  .card img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .card .poster-fallback{
+    width:100%; height:100%;
+    display:flex; align-items:flex-end;
+    padding:12px;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:19px; line-height:1.05;
+    letter-spacing:0.5px;
+    color:rgba(255,255,255,0.92);
+  }
+  .card .badge{
+    position:absolute; top:9px; left:9px;
+    background:rgba(10,10,13,0.72);
+    border:1px solid rgba(255,255,255,0.15);
+    color:var(--amber);
+    font-size:11px; font-weight:800;
+    padding:3px 8px; border-radius:6px;
+    display:flex; align-items:center; gap:4px;
+  }
+  .card .shade{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 55%, transparent 75%);
+  }
+  .card .cardtitle{
+    position:absolute; left:10px; right:10px; bottom:10px;
+    font-family:'Manrope', sans-serif;
+    font-weight:700; font-size:13px;
+    color:#fff;
+    text-shadow:0 2px 6px rgba(0,0,0,0.6);
+  }
+  .card .cardmeta{
+    position:absolute; left:10px; bottom:32px;
+    font-size:10.5px; color:rgba(255,255,255,0.65);
+    font-weight:600;
+  }
+
+  .empty-msg{
+    padding:40px 5vw; color:var(--text-muted); font-size:14px;
+  }
+
+  /* ---------- EVENT CARDS ---------- */
+  .event-card{
+    position:relative; flex:0 0 auto;
+    width:280px; height:150px; border-radius:14px;
+    overflow:hidden; cursor:pointer;
+    background-size:cover; background-position:center;
+    border:1px solid var(--line);
+    scroll-snap-align:start;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .event-card:hover{ transform:translateY(-6px); box-shadow:0 18px 34px rgba(0,0,0,0.5); }
+  .event-cardtitle{
+    position:absolute; left:14px; right:14px; bottom:12px;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:20px; letter-spacing:0.5px;
+    color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.6);
+  }
+
+  /* ---------- LOADING TRANSITION ---------- */
+  #loadOverlay{
+    position:fixed; inset:0; z-index:80;
+    background:rgba(6,6,8,0.88);
+    display:none; align-items:center; justify-content:center;
+    flex-direction:column; gap:16px;
+  }
+  #loadOverlay.show{ display:flex; }
+  .spinner{
+    width:56px; height:56px; border-radius:50%;
+    border:3px solid rgba(255,46,69,0.18);
+    border-top-color:var(--red);
+    animation:spin .8s linear infinite;
+  }
+  .scanline{
+    width:180px; height:2px; background:var(--red);
+    box-shadow:0 0 12px 2px rgba(255,46,69,0.7);
+    animation:scan 1s ease-in-out infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @keyframes scan{ 0%,100%{ transform:translateX(-70px); opacity:.3;} 50%{ transform:translateX(70px); opacity:1;} }
+  .loadlabel{ font-family:'Bebas Neue',sans-serif; letter-spacing:3px; font-size:13px; color:var(--text-muted); }
+
+  /* ---------- MODAL ---------- */
+  #modalBg, #eventModalBg{
+    position:fixed; inset:0; z-index:70;
+    background:rgba(5,5,7,0.72);
+    backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  #modalBg.show, #eventModalBg.show{ display:flex; }
+  .modal{
+    width:100%; max-width:860px; max-height:88vh;
+    overflow-y:auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:20px;
+    display:grid; grid-template-columns:280px 1fr;
+    animation:modalIn .28s ease;
+  }
+  @keyframes modalIn{ from{ opacity:0; transform:translateY(14px) scale(.98);} to{ opacity:1; transform:none;} }
+  .modal-poster{ position:relative; min-height:280px; background:var(--surface-hi); }
+  .modal-poster img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .modal-poster .poster-fallback{ height:100%; padding:20px; align-items:flex-end; font-size:26px; }
+  .modal-close{
+    position:absolute; top:12px; right:12px;
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; font-size:16px; cursor:pointer; z-index:2;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .modal-body{ padding:26px 28px; }
+  .modal-cat{ font-size:11px; font-weight:800; letter-spacing:2px; color:var(--red); text-transform:uppercase; }
+  .modal-title{ font-family:'Bebas Neue', sans-serif; font-size:34px; letter-spacing:1px; margin:6px 0 12px; }
+  .modal-stats{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .stat-pill{
+    display:flex; align-items:center; gap:6px;
+    background:var(--surface-hi); border:1px solid var(--line);
+    padding:6px 12px; border-radius:999px; font-size:12.5px; font-weight:700;
+  }
+  .stat-pill.rating{ color:var(--amber); }
+  .modal-synopsis{ color:var(--text-muted); font-size:14.5px; line-height:1.6; margin-bottom:22px; }
+  .ep-head{ font-size:12px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; }
+  .ep-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+  .ep-btn{
+    border:none; cursor:pointer;
+    font-family:'Manrope', sans-serif; font-weight:800; font-size:13px;
+    color:#0a0a0d;
+    padding:11px 16px; border-radius:10px;
+    min-width:64px;
+    transition:transform .15s ease, filter .15s ease;
+  }
+  .ep-btn:hover{ transform:translateY(-3px); filter:brightness(1.08); }
+  .ep-btn small{ display:block; font-weight:600; font-size:10px; opacity:0.75; }
+  .movie-watch-btn{
+    border:none; cursor:pointer; color:#0a0a0d;
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:14px;
+    padding:13px 26px; border-radius:10px;
+    background:var(--red);
+    transition:transform .15s ease, filter .15s ease;
+  }
+  .movie-watch-btn:hover{ transform:translateY(-3px); filter:brightness(1.08); }
+
+  /* ---------- EVENT MODAL ---------- */
+  .event-modal{ grid-template-columns:1fr; }
+  .event-banner{
+    position:relative; height:210px;
+    background-size:cover; background-position:center;
+  }
+  .event-modal .modal-body{ padding-top:22px; }
+  .event-modal .rail-track{ padding:6px 0 10px; margin:0 -4px; }
+  .event-modal .ep-head{ margin-top:20px; }
+
+  footer{
+    text-align:center; padding:30px 5vw 50px;
+    color:var(--text-muted); font-size:12px;
+    border-top:1px solid var(--line);
+  }
+
+  @media (max-width:640px){
+    header{ gap:14px; }
+    .searchwrap{ order:3; max-width:100%; flex-basis:100%; }
+    .modal{ grid-template-columns:1fr; }
+    .modal-poster{ min-height:200px; }
+  }
+
+  /* ================= INTRO SPLASH ================= */
+  #introScreen{
+    position:fixed; inset:0; z-index:9999;
+    background:#000;
+    overflow:hidden;
+  }
+  #introScreen .intro-panel{
+    position:absolute; top:0; width:50%; height:100%;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,46,69,0.10), transparent 60%),
+      #050507;
+    transition:transform .5s cubic-bezier(.76,0,.24,1);
+  }
+  #introScreen .intro-panel.l{ left:0; transform:translateX(0); }
+  #introScreen .intro-panel.r{ right:0; transform:translateX(0); }
+  #introScreen.split .intro-panel.l{ transform:translateX(-100%); }
+  #introScreen.split .intro-panel.r{ transform:translateX(100%); }
+
+  #introScreen .intro-web{
+    position:absolute; inset:0; opacity:0.18;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 40px);
+  }
+
+  .intro-text{
+    position:absolute; inset:0; z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px;
+    transform:scale(0.3);
+    opacity:0;
+    transition:transform .38s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+  }
+  #introScreen.show .intro-text{ transform:scale(1); opacity:1; }
+  #introScreen.split .intro-text{ transform:scale(1.15); opacity:0; transition:transform .45s ease, opacity .35s ease; }
+
+  .intro-title{
+    font-family:'Bangers', cursive;
+    font-size:clamp(28px, 6vw, 54px);
+    letter-spacing:2px;
+    color:#fff;
+    text-transform:uppercase;
+    text-shadow:
+      0 0 12px rgba(255,46,69,0.75),
+      3px 3px 0 var(--red),
+      -3px -3px 0 var(--violet);
+    text-align:center;
+    padding:0 16px;
+  }
+  .intro-title .x{ color:var(--amber); padding:0 6px; }
+  .intro-sub{
+    font-family:'Bangers', cursive;
+    font-size:clamp(14px, 2.6vw, 20px);
+    letter-spacing:3px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+  }
+  .intro-sub span{ color:var(--red); }
+
+  /* ================= SPIDEY POSTER EFFECTS ================= */
+  .card, .event-card{ touch-action:pan-y; will-change:transform; }
+  .card.touched, .event-card.touched{
+    box-shadow:0 0 0 2px var(--red), 0 18px 34px rgba(255,46,69,0.35) !important;
+  }
+
+  .spidey-pop{
+    position:fixed; z-index:500; pointer-events:none;
+    width:56px; height:56px;
+    left:0; top:0;
+    transform:translate(-50%,-50%) scale(0) rotate(-25deg);
+    animation:spideyPop .7s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  .spidey-pop .mask{
+    position:relative; width:100%; height:100%; border-radius:50%;
+    background:radial-gradient(circle at 32% 30%, #d81922, #7a0d12 72%);
+    box-shadow:0 0 20px rgba(255,46,69,0.65), inset 0 0 0 3px rgba(0,0,0,0.6);
+  }
+  .spidey-pop .mask::before, .spidey-pop .mask::after{
+    content:''; position:absolute; top:36%; width:32%; height:24%;
+    background:#fff;
+    clip-path:polygon(50% 0%, 100% 28%, 82% 100%, 18% 100%, 0% 28%);
+    filter:drop-shadow(0 0 2px rgba(0,0,0,0.5));
+  }
+  .spidey-pop .mask::before{ left:11%; transform:rotate(-10deg); }
+  .spidey-pop .mask::after{ right:11%; transform:rotate(10deg) scaleX(-1); }
+  .spidey-pop .thwip{
+    position:absolute; left:50%; top:-6px; transform:translate(-50%,-100%);
+    font-family:'Bangers', cursive; font-size:15px; letter-spacing:1px;
+    color:var(--amber);
+    text-shadow:2px 2px 0 var(--red), -1px -1px 0 #000;
+    white-space:nowrap;
+  }
+  @keyframes spideyPop{
+    0%{ transform:translate(-50%,-50%) scale(0) rotate(-25deg); opacity:0; }
+    45%{ transform:translate(-50%,-50%) scale(1.18) rotate(8deg); opacity:1; }
+    70%{ transform:translate(-50%,-50%) scale(0.94) rotate(-4deg); opacity:1; }
+    100%{ transform:translate(-50%,-58%) scale(0.8) rotate(0deg); opacity:0; }
+  }
+
+  .web-trail{
+    position:fixed; z-index:499; pointer-events:none;
+    height:3px; left:0; top:0;
+    border-radius:3px;
+    background:linear-gradient(90deg, rgba(255,255,255,0.95), rgba(124,92,255,0.15));
+    transform-origin:0 50%;
+    box-shadow:0 0 8px rgba(255,255,255,0.6);
+    animation:webFade .5s ease forwards;
+  }
+  @keyframes webFade{
+    0%{ opacity:1; }
+    100%{ opacity:0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= INTRO SPLASH ================= -->
+<div id="introScreen">
+  <div class="intro-panel l"></div>
+  <div class="intro-panel r"></div>
+  <div class="intro-web"></div>
+  <div class="intro-text">
+    <div class="intro-title">ANIME4U <span class="x">X</span> WEB MAYHEM</div>
+    <div class="intro-sub">presented by <span>Mystery</span></div>
+  </div>
+</div>
+
+<header>
+  <div class="logo-group">
+    <div class="logo" data-text="MAYHEM" onclick="setView('home')"><span>MAYHEM<span class="dot">.</span></span></div>
+    <div class="glitch-badge" id="eventBadge" data-text=""></div>
+  </div>
+  <nav class="mainnav">
+    <button data-view="home" class="active" onclick="setView('home')">Home</button>
+    <button data-view="movies" onclick="setView('movies')">Movies</button>
+    <button data-view="series" onclick="setView('series')">Web Series</button>
+    <button data-view="events" onclick="setView('events')">Events</button>
+  </nav>
+  <div class="searchwrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="text" placeholder="Search titles..." oninput="renderAll()">
+    <div class="mascotwrap" id="mascotWrap">
+      <div class="mascot-imgwrap" id="mascotImgWrap"></div>
+      <div class="mascot-bubble" id="mascotBubble"></div>
+    </div>
+  </div>
+</header>
+
+<main id="mainContent"></main>
+
+<footer>WEB MAYHEM &mdash; built for best Weekend. ©Anime4u Presents.</footer>
+
+<!-- loading transition -->
+<div id="loadOverlay">
+  <div class="spinner"></div>
+  <div class="scanline"></div>
+  <div class="loadlabel">LOADING TITLE...</div>
+</div>
+
+<!-- detail modal -->
+<div id="modalBg" onclick="if(event.target.id==='modalBg') closeModal();">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<!-- event modal -->
+<div id="eventModalBg" onclick="if(event.target.id==='eventModalBg') closeEventModal();">
+  <div class="modal event-modal" id="eventModalContent"></div>
+</div>
+
+<script>
+/* =====================================================================
+   ADMIN CONTROL PANEL
+   ---------------------------------------------------------------------
+   Everything the owner needs to edit lives in this one block.
+   Four sections below:
+     1. SITE_SETTINGS   -> logo text, tagline (cosmetic, header/footer)
+     2. EVENTS_DATA      -> events shown in the "Events" row/page, each
+                            linked to whichever movies/series you choose
+     3. MOVIES_DATA     -> every movie shown under "Movies"
+     4. SERIES_DATA     -> every web series shown under "Web Series"
+                           (and on Home, if isLatest: true)
+
+   HOW TO SET A LOGO IMAGE / BACKGROUND IMAGE
+   --------------------------------------------
+     logoUrl        : leave "" to keep the default text logo (site name),
+                       or paste a direct image URL to show a logo image
+                       in the header instead.
+     backgroundUrl  : leave "" to keep the default dark background,
+                       or paste a direct image URL to use it as the
+                       site background instead.
+
+   HOW TO CHANGE THE EVENT BADGE (e.g. "X MARVEL MONTH")
+   --------------------------------------------------------
+     eventBadgeText : the little glitch-font tag shown next to the logo.
+                       Change it to anything, anytime, e.g. "X HORROR MONTH"
+                       or "X ANIME WEEK". Set it to "" to hide it completely.
+
+   HOW TO SET UP THE SEARCH-BAR MASCOT
+   --------------------------------------------
+     mascotImageUrl : leave "" to show a default emoji mascot, or paste a
+                       direct image URL to show your own character instead.
+                       It glows automatically.
+     mascotGreeting : the text shown in the speech bubble when someone
+                       taps/focuses the search bar. Change it to whatever
+                       you want the character to say.
+
+   HOW TO ADD AN EVENT
+   -------------------
+   Copy one {...} block inside EVENTS_DATA and change the values.
+     title       : Event name shown on the banner card and popup
+                   (e.g. "Marvel Month")
+     image       : leave "" to use an auto-generated colour banner,
+                   or paste a direct image URL
+     colors      : [colorA, colorB] used ONLY if image is ""
+     description : 1-3 sentence blurb shown when the event is opened
+     movies      : array of exact MOVIES_DATA titles to link to this
+                   event, e.g. ["Enola Holmes (2020)", "Fever Line"]
+     series      : array of exact SERIES_DATA titles to link to this
+                   event, e.g. ["Spider-Noir"]
+   Titles must match the "title" field of a movie/series exactly
+   (copy-paste it) for the link to work. Tapping the event on the site
+   opens a popup showing every movie/series you listed here.
+
+   HOW TO ADD A MOVIE
+   -------------------
+   Copy one {...} block inside MOVIES_DATA and change the values.
+     title      : Movie name shown on the card and popup
+     poster     : leave "" to use an auto-generated colour poster,
+                  or paste a direct image URL (must end in .jpg/.png/.webp)
+     colors     : [colorA, colorB] used ONLY if poster is ""
+     rating     : e.g. "8.4"
+     synopsis   : 1-3 sentence description shown in the popup
+     watchLink  : the URL the big "Watch Movie" button opens
+
+   HOW TO ADD A WEB SERIES
+   ------------------------
+   Same as a movie, plus:
+     season       : e.g. "Season 2"
+     isLatest     : true  -> also appears in the "Latest Series" row on Home
+     episodes     : a list of buttons, one per episode.
+        num   : text on the button, e.g. "1", "E2", "S2E3"
+        label : small text under the number, e.g. "Pilot"
+        link  : the URL that button opens when clicked
+       (episode buttons cycle through the ACCENT_COLORS palette below
+        automatically, so you don't need to set colors per episode)
+
+   That's it — the rest of the file just reads this data and draws
+   the page automatically. You never need to touch anything below
+   the "DO NOT EDIT PAST THIS LINE" marker unless you want to change
+   how the site behaves, not what it shows.
+===================================================================== */
+
+const SITE_SETTINGS = {
+  siteName: "WEB MAYHEM",
+  tagline: "Watch your favorite series here.",
+  logoUrl: "https://i.ibb.co/vv6YCjnK/IMG-20260705-221247-893-removebg-preview.png",        // e.g. "https://i.ibb.co/nNsV270r/file-00000000ed8c72079e9d9d5c8e86e885.png"
+  backgroundUrl: "https://i.ibb.co/fGkm3FTM/dark-blue-memphis-facebook-story-background-vector-53876-162121.jpg",   // e.g. "https://i.ibb.co/tpYxMbkz/file-000000005364720787fe128dc5a4fe63.png"
+
+  eventBadgeText: "X MARVEL MONTH",   // glitch-font tag next to the logo. Change anytime, or set to "" to hide it.
+
+  mascotImageUrl: "https://i.ibb.co/S4BDxSZ4/images-3-removebg-preview.png",   // paste a direct image URL for the search mascot; leave "" for a default emoji mascot
+  mascotGreeting: "Hi! Are you searching something?"   // text the mascot says when the search bar is tapped/focused
+};
+
+// Colours used for auto-generated posters (when poster:"" ) and for
+// cycling episode-button colours. Add/remove hex codes as you like.
+const ACCENT_COLORS = ["#ff2e45", "#ffb020", "#7c5cff", "#22c7a9", "#ff6f9c", "#4f8dff"];
+
+const EVENTS_DATA = [
+  {
+    title: "Marvel Month",
+    image: "https://i.ibb.co/bfgyFBF/5-Pn-Jx7-Bc-Ceq36-Ppe-B7o-Gy-Q.jpg",
+    colors: ["#3d0f1a", "#ff2e45"],
+    description: "A month-long lineup of hand-picked movies and series, all in one place. Tap a title below to jump straight to it.",
+    movies: ["Captain America The First Avenger (2011)","Captain Marvel (2019)","Iron Man (2008)","The Incredible Hulk (2008)","Iron Man 2 (2010)","Thor (2011)","Avengers (2012)","Iron Man 3 (2013)"], 
+    series: ["Spider-Noir"]
+  }
+];
+
+const MOVIES_DATA = [
+  {
+    title: "The Sheep Detectives",
+    poster: "https://i.ibb.co/PZgRgzHH/images-1.jpg",
+    colors: ["#1f2a48", "#ff2e45"],
+    rating: "9.2",
+    synopsis: "George Hardy is a shepherd who loves to read murder mysteries to his sheep, never suspecting that they can understand him. When George is found dead under mysterious circumstances, the sheep decide to solve the crime themselves, even if it means leaving their meadow for the first time and facing the fact that the human world isn't as simple as it appears in books.",
+    watchLink: "https://gofile.io/d/ODupio"
+  },
+  {
+    title: "Enola Holmes (2020)",
+    poster: "https://i.ibb.co/fVNv7y1L/ems.jpg",
+    colors: ["#301934", "#ffb020"],
+    rating: "6.7",
+    synopsis: "Overshadowed by the legacy of her brothers, an intrepid teenager sets out to prove herself after her mother disappears. While forming unlikely alliances along the way, she discovers her true worth.",
+    watchLink: "https://gofile.io/d/yLrrVR"
+  },
+  {
+    title: "Enola Holmes 2 (2022)",
+    poster: "https://i.ibb.co/JRvryxsf/images-1.jpg",
+    colors: ["#173d3d", "#22c7a9"],
+    rating: "6.8",
+    synopsis: "Enola Holmes takes on her first case as a detective, but to unravel the mystery of a missing girl, she'll need some help from friends -- and brother Sherlock.",
+    watchLink: "https://gofile.io/d/gPKtvB"
+  },
+  {
+    title: "Enola Holmes 3 (2026)",
+    poster: "https://i.ibb.co/vvJSw76x/MV5-BYz-Vh-Nm-Q0-Mz-It-Njg3-Mi00-Mz-M1-LWI5-MDUt-OGZl-MTFj-NTJj-MTM2-Xk-Ey-Xk-Fqc-Gc-V1-QL75-UY562-CR35-0-3.jpg",
+    colors: ["#2a1a3d", "#7c5cff"],
+    rating: "6.1",
+    synopsis: "Adventure follows detective Enola Holmes to Malta, where her plans to tie the knot unravel when Sherlock's disappearance plunges her into a perilous case.",
+    watchLink: "https://example.com/watch/last-transmission"
+  },
+  {
+    title: "Project Hail Mary (2026)",
+    poster: "https://i.ibb.co/r2YkZ6Bq/IMG-20260703-230126-999.jpg",
+    colors: ["#402020", "#ff2e45"],
+    rating: "8.2",
+    synopsis: "Science teacher Ryland Grace wakes up on a spaceship with no recollection of who he is or how he got there. As his memory slowly returns, he soon discovers he must solve the riddle behind a mysterious substance that's causing the sun to die out. As details of the mission unravel, he calls on his scientific training and sheer ingenuity -- but he may not have to do it alone.",
+    watchLink: "https://gofile.io/d/9npr4U"
+  },
+  {
+    title: "Captain America The First Avenger (2011)",
+    poster: "https://i.ibb.co/SX47nFx1/s-l1200.jpg",
+    colors: ["#3d1f1f", "#ffb020"],
+    rating: "6.9",
+    synopsis: "During World War II, Steve Rogers decides to volunteer in an experiment that transforms his weak body. He must now battle a secret Nazi organisation headed by Johann Schmidt to defend his nation.",
+    watchLink: "https://gofile.io/d/VEHasl"
+  },
+  {
+    title: "Captain Marvel (2019)",
+    poster: "https://i.ibb.co/Nngcbd1Q/download.jpg",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "6.7",
+    synopsis: "Carol Danvers becomes one of the universe's most powerful heroes when Earth is caught in the middle of a galactic war between two alien races.",
+    watchLink: "https://gofile.io/d/9dkgpC"
+  },
+  {
+    title: "Iron Man (2008)",
+    poster: "https://i.ibb.co/sdzF0PC7/iron-man-2008-by-sithlord38-dfndq8d-fullview.jpg",
+    colors: ["#241a3d", "#ff6f9c"],
+    rating: "7.9",
+    synopsis: "After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.",
+    watchLink: "https://gofile.io/d/tPrEyY"
+  }, 
+  {
+    title: "The Incredible Hulk (2008)",
+    poster: "https://i.ibb.co/3yYpcfXd/MV5-BNz-I4-Yjky-ZTQt-Mjk1-NS00-Mzhk-LWEw-Yzgt-Zj-Zi-ODUy-NWVi-NDdl-Xk-Ey-Xk-Fqc-Gc-V1-FMjpg-UX1000.jpg",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "6.6",
+    synopsis: "Dr Bruce Banner subjects himself to high levels of gamma radiation, which triggers his transformation into a huge green creature, the Hulk, whenever he experiences negative emotions such as anger.",
+    watchLink: "https://gofile.io/d/3MZ231"
+  }, 
+  {
+    title: "Iron Man 2 (2010)",
+    poster: "https://i.ibb.co/CKLZ1myp/91l-DYIZAu4-L-AC-UF1000-1000-QL80.jpg",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "6.9",
+    synopsis: "Tony Stark is under pressure from various sources, including the government, to share his technology with the world. He must find a way to fight them while also tackling his other enemies.",
+    watchLink: "https://gofile.io/d/eypTnh"
+  }, 
+  {
+    title: "Thor (2011)",
+    poster: "https://i.ibb.co/qLCMzV2M/MV5-BNj-Rh-NGZj-Zj-Et-YTQz-YS00-OWUx-LThj-NGEt-MTIw-MTE2-ZDFl-ZTZk-Xk-Ey-Xk-Fqc-Gc-V1-FMjpg-UX1000.jpg",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "7.0",
+    synopsis: "Thor is exiled by his father, Odin, the King of Asgard, to the Earth to live among mortals. When he lands on Earth, his trusted weapon Mjolnir is discovered and captured by S.H.I.E.L.D.",
+    watchLink: "https://gofile.io/d/faCdtQ"
+  },
+  {
+    title: "Avengers (2012)",
+    poster: "https://i.ibb.co/JwQm4yZ7/images-1.jpg",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "8.0",
+    synopsis: "S.H.I.E.L.D. leader Nick Fury is compelled to launch the Avengers programme when Loki poses a threat to planet Earth. But the superheroes must learn to work together if they are to stop him in time.", 
+    watchLink: "https://gofile.io/d/umO2ys"
+  }, 
+  {
+    title: "Iron Man 3 (2013)",
+    poster: "https://i.ibb.co/RkbXLHZL/images-2.jpg",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "7.1",
+    synopsis: "Suffering from PTSD, Tony Stark encounters a formidable foe called the Mandarin. When he watches his world fall apart, he must rely on his own instincts as he embarks on a journey of retribution.", 
+    watchLink: "https://gofile.io/d/1iYUsT"
+  }, 
+  {
+    title: "None soon Added (20701)",
+    poster: "",
+    colors: ["#1a2a3d", "#4f8dff"],
+    rating: "8.0",
+    synopsis: "", 
+    watchLink: ""
+  }
+];
+
+const SERIES_DATA = [
+  {
+    title: "Spider-Noir",
+    poster: "https://i.ibb.co/zTyPPD2w/images-2.jpg",
+    colors: ["#3d0f1a", "#ff2e45"],
+    rating: "7.8",
+    season: "Season 1",
+    isLatest: true,
+    synopsis: "Ben Reilly, a seasoned, down on his luck private investigator in the 1930s New York, is forced to grapple with his past life, following a deeply personal tragedy, as the city's one and only superhero.",
+    episodes: [
+      { num: "1", label: "Step Into My Office", link: "https://gofile.io/d/LQI3XG" },
+      { num: "2", label: "Tread Lightly", link: "https://gofile.io/d/2ranO5" },
+      { num: "3", label: "Double Cross", link: "https://gofile.io/d/EaNBFd" },
+      { num: "4", label: "A Mistake I'll Never Make Again", link: "https://gofile.io/d/bWZPzt" },
+      { num: "5", label: "Betrayal", link: "https://gofile.io/d/OSYhLM" },
+      { num: "6", label: "Nightmare On A Gurney", link: "https://gofile.io/d/zh5dJ2" },
+      { num: "7", label: "Nobody's Hero", link: "https://gofile.io/d/Cn1tkM" },
+      { num: "8", label: "The Man In The Mask", link: "https://gofile.io/d/Sq3X0N" }
+    ]
+  },
+  {
+    title: "Avatar:The Last Airbender",
+    poster: "https://i.ibb.co/hRn6br6K/images-2.jpg",
+    colors: ["#1a1a3d", "#7c5cff"],
+    rating: "8.1",
+    season: "Season 1",
+    isLatest: true,
+    synopsis: "A young boy known as the Avatar must master the four elemental powers to save a world at war and fight a ruthless enemy bent on stopping him.",
+    episodes: [
+      { num: "1", label: "Aang", link: "https://gofile.io/d/LQI3XG" },
+      { num: "2", label: "Warriors", link: "https://gofile.io/d/2ranO5" },
+      { num: "3", label: "Omashu", link: "https://gofile.io/d/EaNBFd" }, 
+      { num: "4", label: "Into The Dark", link: "https://gofile.io/d/bWZPzt" },
+      { num: "5", label: "Spirited Away", link: "https://gofile.io/d/OSYhLM" },
+      { num: "6", label: "Masks", link: "https://gofile.io/d/zh5dJ2" },
+      { num: "7", label: "The North", link: "https://gofile.io/d/Cn1tkM" },
+      { num: "8", label: "Legends", link: "https://gofile.io/d/Sq3X0N" }      
+    ]
+  },
+  {
+    title: "Avatar:The Last Airbender",
+    poster: "https://i.ibb.co/23ztDCfp/MV5-BY2-Y5-OTM0-MDAt-OWZk-NS00-MWIy-LWIx-Mz-It-Yz-Y3-ODlj-MTY3-ODNl-Xk-Ey-Xk-Fqc-Gc-V1.jpg",
+    colors: ["#2a2a2a", "#ffb020"],
+    rating: "7.8",
+    season: "Season 2",
+    isLatest: true,
+    synopsis: "A young boy known as the Avatar must master the four elemental powers to save a world at war and fight a ruthless enemy bent on stopping him.",
+    episodes: [
+      { num: "1", label: "Somewhere Safe", link: "https://gofile.io/d/81G5tq" },
+      { num: "2", label: "A Fight,Once Begun", link: "https://gofile.io/d/acEWbq" },
+      { num: "3", label: "City Of Walls And Secrets", link: "https://gofile.io/d/Fm3wzs " },
+      { num: "4", label: "The Water Falls The Stones Emerge", link: "https://gofile.io/d/cek571" },
+      { num: "5", label: "Ten Thousand Things", link: "https://gofile.io/d/vnt1OD" }, 
+      { num: "6", label: "The Parable Of The Two Dragons", link: "https://gofile.io/d/bFjOC2" },
+      { num: "7", label: "Something Broken", link: "https://gofile.io/d/jHIjyU" }
+    ]
+  },
+  {
+    title: "Neon Requiem",
+    poster: "",
+    colors: ["#3d1a3d", "#22c7a9"],
+    rating: "8.9",
+    season: "Season 1",
+    isLatest: true,
+    synopsis: "In a city that never turns its lights off, a composer's last unfinished symphony holds the code to everyone's memories.",
+    episodes: [
+      { num: "1", label: "First Note", link: "https://example.com/watch/neon-requiem/s1e1" },
+      { num: "2", label: "Interval", link: "https://example.com/watch/neon-requiem/s1e2" },
+      { num: "3", label: "Coda", link: "https://example.com/watch/neon-requiem/s1e3" }
+    ]
+  },
+  {
+    title: "Velvet Circuit",
+    poster: "",
+    colors: ["#1a3d2a", "#ff6f9c"],
+    rating: "7.5",
+    season: "Season 4",
+    isLatest: false,
+    synopsis: "A poker dealer with a photographic memory gets pulled into the biggest underground circuit the city has ever run.",
+    episodes: [
+      { num: "1", label: "Buy-In", link: "https://example.com/watch/velvet-circuit/s4e1" },
+      { num: "2", label: "The Tell", link: "https://example.com/watch/velvet-circuit/s4e2" }
+    ]
+  },
+  {
+    title: "Ash & Ember",
+    poster: "",
+    colors: ["#3d2a1a", "#ff2e45"],
+    rating: "8.3",
+    season: "Season 2",
+    isLatest: false,
+    synopsis: "Two sisters on opposite sides of a wildfire-ravaged border have to work together to get their family out alive.",
+    episodes: [
+      { num: "1", label: "Smoke Line", link: "https://example.com/watch/ash-ember/s2e1" },
+      { num: "2", label: "Backdraft", link: "https://example.com/watch/ash-ember/s2e2" },
+      { num: "3", label: "Embers", link: "https://example.com/watch/ash-ember/s2e3" }
+    ]
+  },
+  {
+    title: "The Long Static",
+    poster: "",
+    colors: ["#0f2a3d", "#ffb020"],
+    rating: "7.2",
+    season: "Season 1",
+    isLatest: false,
+    synopsis: "A submarine crew loses contact with the surface, and the silence on the radio starts to feel like it's listening back.",
+    episodes: [
+      { num: "1", label: "Depth", link: "https://example.com/watch/long-static/s1e1" },
+      { num: "2", label: "Pressure", link: "https://example.com/watch/long-static/s1e2" }
+    ]
+  },
+  {
+    title: "Wolfline",
+    poster: "",
+    colors: ["#2a1f3d", "#4f8dff"],
+    rating: "8.0",
+    season: "Season 3",
+    isLatest: false,
+    synopsis: "A border-town sheriff hunts a pattern of disappearances that only happen on the nights of a full moon.",
+    episodes: [
+      { num: "1", label: "Full Moon", link: "https://example.com/watch/wolfline/s3e1" },
+      { num: "2", label: "Tracks", link: "https://example.com/watch/wolfline/s3e2" },
+      { num: "3", label: "Den", link: "https://example.com/watch/wolfline/s3e3" }
+    ]
+  }
+];
+
+/* =====================================================================
+   DO NOT EDIT PAST THIS LINE
+   (this part just renders the page using the data above)
+===================================================================== */
+
+document.title = SITE_SETTINGS.siteName;
+
+const logoEl = document.querySelector('.logo');
+if(SITE_SETTINGS.logoUrl){
+  logoEl.classList.add('has-image');
+  logoEl.removeAttribute('data-text');
+  logoEl.innerHTML = `<img src="${SITE_SETTINGS.logoUrl}" alt="${SITE_SETTINGS.siteName}">`;
+} else {
+  logoEl.setAttribute('data-text', SITE_SETTINGS.siteName);
+  logoEl.innerHTML = `<span>${SITE_SETTINGS.siteName}<span class="dot">.</span></span>`;
+}
+
+if(SITE_SETTINGS.backgroundUrl){
+  document.body.classList.add('has-bg-image');
+  document.body.style.backgroundImage = `linear-gradient(rgba(10,10,13,0.78), rgba(10,10,13,0.9)), url('${SITE_SETTINGS.backgroundUrl}')`;
+}
+
+const badgeEl = document.getElementById('eventBadge');
+if(SITE_SETTINGS.eventBadgeText && SITE_SETTINGS.eventBadgeText.trim()){
+  badgeEl.setAttribute('data-text', SITE_SETTINGS.eventBadgeText);
+  badgeEl.textContent = SITE_SETTINGS.eventBadgeText;
+  badgeEl.style.display = '';
+} else {
+  badgeEl.style.display = 'none';
+}
+
+const mascotWrap = document.getElementById('mascotWrap');
+const mascotImgWrap = document.getElementById('mascotImgWrap');
+const mascotBubble = document.getElementById('mascotBubble');
+const searchInputEl = document.getElementById('searchInput');
+
+mascotImgWrap.innerHTML = SITE_SETTINGS.mascotImageUrl
+  ? `<img src="${SITE_SETTINGS.mascotImageUrl}" alt="mascot">`
+  : `👋`;
+mascotBubble.textContent = SITE_SETTINGS.mascotGreeting || "Hi! Are you searching something?";
+
+searchInputEl.addEventListener('focus', ()=> mascotWrap.classList.add('show'));
+searchInputEl.addEventListener('blur', ()=> setTimeout(()=> mascotWrap.classList.remove('show'), 150));
+
+let currentView = 'home';
+
+function setView(view){
+  currentView = view;
+  document.querySelectorAll('nav.mainnav button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+  renderAll();
+}
+
+function posterInner(item){
+  if(item.poster){
+    return `<img src="${item.poster}" alt="${item.title}" loading="lazy">`;
+  }
+  const [c1,c2] = item.colors && item.colors.length ? item.colors : ["#1f1f26","#ff2e45"];
+  return `<div class="poster-fallback" style="background:linear-gradient(155deg, ${c1}, ${c2});">${item.title}</div>`;
+}
+
+function cardHTML(item, kind, idx){
+  const meta = kind === 'series' ? item.season : (item.episodes ? '' : 'Movie');
+  return `
+    <div class="card" onclick="openTitle('${kind}', ${idx})">
+      ${posterInner(item)}
+      <div class="badge">★ ${item.rating}</div>
+      <div class="shade"></div>
+      ${meta ? `<div class="cardmeta">${meta}</div>` : ''}
+      <div class="cardtitle">${item.title}</div>
+    </div>`;
+}
+
+function eventCardHTML(ev, idx){
+  const bg = ev.image
+    ? `background-image:url('${ev.image}');`
+    : `background-image:linear-gradient(155deg, ${(ev.colors&&ev.colors[0])||'#1f1f26'}, ${(ev.colors&&ev.colors[1])||'#ff2e45'});`;
+  return `
+    <div class="event-card" style="${bg}" onclick="openEvent(${idx})">
+      <div class="shade"></div>
+      <div class="event-cardtitle">${ev.title}</div>
+    </div>`;
+}
+
+function railHTML(id, eyebrow, title, items, kind){
+  if(!items.length) return '';
+  const cards = items.map((it)=>{
+    const realIdx = kind==='series' ? SERIES_DATA.indexOf(it) : MOVIES_DATA.indexOf(it);
+    return cardHTML(it, kind, realIdx);
+  }).join('');
+  return `
+    <section class="rail-section">
+      <div class="rail-head">
+        <div>
+          <span class="rail-eyebrow">${eyebrow}</span>
+          <span class="rail-title">${title}</span>
+        </div>
+        <div class="rail-arrows">
+          <button onclick="scrollRail('${id}', -1)">&#8592;</button>
+          <button onclick="scrollRail('${id}', 1)">&#8594;</button>
+        </div>
+      </div>
+      <div class="rail-track" id="${id}">${cards}</div>
+    </section>`;
+}
+
+function eventsRailHTML(id, eyebrow, title, items){
+  if(!items.length) return '';
+  const cards = items.map((ev)=> eventCardHTML(ev, EVENTS_DATA.indexOf(ev))).join('');
+  return `
+    <section class="rail-section">
+      <div class="rail-head">
+        <div>
+          <span class="rail-eyebrow">${eyebrow}</span>
+          <span class="rail-title">${title}</span>
+        </div>
+        <div class="rail-arrows">
+          <button onclick="scrollRail('${id}', -1)">&#8592;</button>
+          <button onclick="scrollRail('${id}', 1)">&#8594;</button>
+        </div>
+      </div>
+      <div class="rail-track" id="${id}">${cards}</div>
+    </section>`;
+}
+
+function scrollRail(id, dir){
+  const track = document.getElementById(id);
+  if(track) track.scrollBy({ left: dir * 520, behavior: 'smooth' });
+}
+
+function matchesSearch(item, q){
+  return !q || item.title.toLowerCase().includes(q);
+}
+
+function renderAll(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const main = document.getElementById('mainContent');
+
+  const latest = SERIES_DATA.filter(s => s.isLatest && matchesSearch(s, q));
+  const movies = MOVIES_DATA.filter(m => matchesSearch(m, q));
+  const series = SERIES_DATA.filter(s => matchesSearch(s, q));
+  const events = EVENTS_DATA.filter(e => matchesSearch(e, q));
+
+  let html = '';
+
+  if(currentView === 'home'){
+    html += eventsRailHTML('rail-events', 'Featured', 'Events', events);
+    html += railHTML('rail-latest', 'New This Week', 'Latest Series', latest, 'series');
+    html += railHTML('rail-home-movies', 'Trending', 'Movies', movies, 'movies');
+    html += railHTML('rail-home-series', 'Binge Worthy', 'Web Series', series, 'series');
+  } else if(currentView === 'movies'){
+    html += railHTML('rail-movies', 'Full Catalogue', 'Movies', movies, 'movies');
+  } else if(currentView === 'series'){
+    html += railHTML('rail-series', 'Full Catalogue', 'Web Series', series, 'series');
+  } else if(currentView === 'events'){
+    html += eventsRailHTML('rail-events-full', 'Full Catalogue', 'Events', events);
+  }
+
+  if(!html){
+    html = `<div class="empty-msg">Nothing matches "${q}". Try another title.</div>`;
+  }
+  main.innerHTML = html;
+}
+
+function openTitle(kind, idx){
+  const item = kind === 'series' ? SERIES_DATA[idx] : MOVIES_DATA[idx];
+  const overlay = document.getElementById('loadOverlay');
+  overlay.classList.add('show');
+  setTimeout(()=>{
+    overlay.classList.remove('show');
+    showModal(item, kind);
+  }, 700);
+}
+
+function showModal(item, kind){
+  const modal = document.getElementById('modalContent');
+  const posterBlock = item.poster
+    ? `<img src="${item.poster}" alt="${item.title}">`
+    : (()=>{ const [c1,c2] = item.colors||["#1f1f26","#ff2e45"];
+        return `<div class="poster-fallback" style="background:linear-gradient(155deg, ${c1}, ${c2}); height:100%;">${item.title}</div>`; })();
+
+  const statPills = `
+    <div class="stat-pill rating">★ ${item.rating}</div>
+    ${kind === 'series' ? `<div class="stat-pill">${item.season}</div>` : ''}
+    ${kind === 'series' ? `<div class="stat-pill">${item.episodes.length} Episodes</div>` : `<div class="stat-pill">Movie</div>`}
+  `;
+
+  let actionBlock = '';
+  if(kind === 'series'){
+    const buttons = item.episodes.map((ep, i)=>{
+      const color = ACCENT_COLORS[i % ACCENT_COLORS.length];
+      return `<button class="ep-btn" style="background:${color};" onclick="window.open('${ep.link}', '_blank')">
+                ${ep.num}<small>${ep.label}</small>
+              </button>`;
+    }).join('');
+    actionBlock = `
+      <div class="ep-head">Episodes</div>
+      <div class="ep-grid">${buttons}</div>`;
+  } else {
+    actionBlock = `<button class="movie-watch-btn" onclick="window.open('${item.watchLink}', '_blank')">▶ Watch Movie</button>`;
+  }
+
+  modal.innerHTML = `
+    <div class="modal-poster">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      ${posterBlock}
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat">${kind === 'series' ? 'Web Series' : 'Movie'}</div>
+      <div class="modal-title">${item.title}</div>
+      <div class="modal-stats">${statPills}</div>
+      <div class="modal-synopsis">${item.synopsis}</div>
+      ${actionBlock}
+    </div>`;
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('show');
+}
+
+function openEvent(idx){
+  const ev = EVENTS_DATA[idx];
+  const overlay = document.getElementById('loadOverlay');
+  overlay.classList.add('show');
+  setTimeout(()=>{
+    overlay.classList.remove('show');
+    showEventModal(ev);
+  }, 700);
+}
+
+function showEventModal(ev){
+  const modal = document.getElementById('eventModalContent');
+  const bannerStyle = ev.image
+    ? `background-image:url('${ev.image}');`
+    : `background-image:linear-gradient(155deg, ${(ev.colors&&ev.colors[0])||'#1f1f26'}, ${(ev.colors&&ev.colors[1])||'#ff2e45'});`;
+
+  const linkedMovies = MOVIES_DATA
+    .map((m, i)=>({ item:m, i }))
+    .filter(({item}) => (ev.movies||[]).includes(item.title));
+  const linkedSeries = SERIES_DATA
+    .map((s, i)=>({ item:s, i }))
+    .filter(({item}) => (ev.series||[]).includes(item.title));
+
+  const movieCards = linkedMovies.map(({item,i}) => cardHTML(item, 'movies', i)).join('');
+  const seriesCards = linkedSeries.map(({item,i}) => cardHTML(item, 'series', i)).join('');
+
+  modal.innerHTML = `
+    <div class="event-banner" style="${bannerStyle}">
+      <button class="modal-close" onclick="closeEventModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat">Event</div>
+      <div class="modal-title">${ev.title}</div>
+      <div class="modal-synopsis">${ev.description||''}</div>
+      ${movieCards ? `<div class="ep-head">Movies In This Event</div><div class="rail-track">${movieCards}</div>` : ''}
+      ${seriesCards ? `<div class="ep-head">Web Series In This Event</div><div class="rail-track">${seriesCards}</div>` : ''}
+      ${(!movieCards && !seriesCards) ? `<div class="empty-msg" style="padding:0;">No titles linked to this event yet.</div>` : ''}
+    </div>`;
+  document.getElementById('eventModalBg').classList.add('show');
+}
+
+function closeEventModal(){
+  document.getElementById('eventModalBg').classList.remove('show');
+}
+
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ closeModal(); closeEventModal(); } });
+
+renderAll();
+
+/* ===================== INTRO SPLASH SEQUENCE ===================== */
+(function(){
+  const intro = document.getElementById('introScreen');
+  if(!intro) return;
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=> intro.classList.add('show'));
+  });
+  setTimeout(()=> intro.classList.add('split'), 560);
+  setTimeout(()=>{
+    intro.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 1020);
+})();
+
+/* ===================== SPIDEY POSTER TOUCH / SWIPE EFFECTS ===================== */
+(function(){
+  let activeCard = null;
+  let startX = 0, startY = 0, startTime = 0, moved = false;
+
+  function spawnMascot(x, y){
+    const el = document.createElement('div');
+    el.className = 'spidey-pop';
+    el.innerHTML = '<div class="mask"></div><div class="thwip">THWIP!</div>';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 750);
+  }
+
+  function spawnWebTrail(x1, y1, x2, y2){
+    const dx = x2 - x1, dy = y2 - y1;
+    const dist = Math.max(20, Math.hypot(dx, dy));
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const el = document.createElement('div');
+    el.className = 'web-trail';
+    el.style.left = x1 + 'px';
+    el.style.top = y1 + 'px';
+    el.style.width = dist + 'px';
+    el.style.transform = 'rotate(' + angle + 'deg)';
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 550);
+  }
+
+  function resetCard(card){
+    if(!card) return;
+    card.style.transform = '';
+    card.classList.remove('touched');
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
+    const card = e.target.closest('.card, .event-card');
+    if(!card) return;
+    activeCard = card;
+    startX = e.clientX; startY = e.clientY; startTime = Date.now();
+    moved = false;
+    card.classList.add('touched');
+  });
+
+  document.addEventListener('pointermove', (e)=>{
+    if(!activeCard) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    const dist = Math.hypot(dx, dy);
+    if(dist > 14){
+      moved = true;
+      const tiltX = Math.max(-14, Math.min(14, dy / 6));
+      const tiltY = Math.max(-14, Math.min(14, -dx / 6));
+      activeCard.style.transform = 'perspective(700px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale(1.04)';
+    }
+  });
+
+  document.addEventListener('pointerup', (e)=>{
+    if(!activeCard) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    const dist = Math.hypot(dx, dy);
+    const elapsed = Date.now() - startTime;
+    resetCard(activeCard);
+    if(dist > 36){
+      spawnWebTrail(startX, startY, e.clientX, e.clientY);
+    } else if(elapsed < 450 && !moved){
+      spawnMascot(e.clientX, e.clientY);
+    }
+    activeCard = null;
+  });
+
+  document.addEventListener('pointercancel', ()=>{
+    resetCard(activeCard);
+    activeCard = null;
+  });
+})();
+</script>
+</body>
+</html>
